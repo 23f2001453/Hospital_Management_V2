@@ -4,6 +4,8 @@ from flask import Flask
 from flask_security import Security
 from flask_restful import Api
 
+from flask_cors import CORS
+
 from controllers.database import db
 from controllers.models import User, Role
 from controllers.user_datastore import user_datastore
@@ -40,6 +42,9 @@ from controllers.treatment_apis import (
 def create_app():
     app = Flask(__name__)
     app.config.from_object('controllers.config.Config')
+
+    # Initialize CORS here, inside the factory
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     # ── Extensions ────────────────────────────────────────────────────────
     db.init_app(app)
@@ -142,6 +147,7 @@ def create_app():
 
 
 app, api = create_app()
+CORS(app)  # Enable CORS for all routes
 
 
 @app.route('/')

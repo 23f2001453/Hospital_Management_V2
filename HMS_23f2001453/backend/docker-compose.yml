@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning
+    restart: unless-stopped
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "1025:1025"   # SMTP — Flask sends mail here
+      - "8025:8025"   # Web UI — view emails at http://localhost:8025
+    restart: unless-stopped
+
+  flower:
+    image: mher/flower:latest
+    ports:
+      - "5555:5555"   # Celery task monitor UI
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+volumes:
+  redis_data:

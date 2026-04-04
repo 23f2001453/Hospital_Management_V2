@@ -2,3 +2,9 @@ flask
 flask_sqlalchemy
 flask_security_too
 flask_restful
+celery
+-U "celery[redis]"
+flask_cors
+flask_mailman
+redis
+flower

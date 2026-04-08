@@ -3,15 +3,15 @@
 Patient CSV export task — user-triggered async job.
 
 When a patient requests their treatment history export:
-  1. A Celery task is queued immediately (returns task_id to frontend)
+  1. A Celery task is queued immediately (returns task_id to vue part)
   2. The task runs in the background, builds the CSV
   3. Sends an email with the CSV attached to the patient
   4. Frontend can poll GET /api/jobs/<task_id> for status
 """
 import csv
 import io
-import sqlalchemy as sa
-from flask_mailman import EmailMessage
+import sqlalchemy as sa # type: ignore
+from flask_mailman import EmailMessage  # type: ignore
 
 from celery_app import make_celery
 from app import app

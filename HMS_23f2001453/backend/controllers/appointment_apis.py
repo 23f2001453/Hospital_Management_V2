@@ -1,15 +1,23 @@
-# app/api/appointment_apis.py
 """
 Appointment & Availability REST API
-=====================================
+
 Covers everything a Patient, Doctor, and Admin needs
 for the scheduling side of the application.
 
-Auth: All endpoints require the header —
-    Authentication-Token: <auth_token>
+Endpoints are organized by resource and HTTP method, following RESTful conventions.
+Endpoints:
+- GET  /api/doctors
+- GET  /api/doctors/<doctor_id>/availability
+- POST /api/doctor/availability          - Doctor creates a slot
+- GET  /api/doctor/availability          - Doctor views their own slots
+- PUT  /api/doctor/availability/<slot_id>   - Doctor edits a slot
+- DELETE /api/doctor/availability/<slot_id> - Doctor deletes a slot
+- POST /api/appointments/book/<slot_id>  - Patient books a specific availability slot
+- GET  /api/appointments               - Patient views their appointments
+- GET  /api/doctor/appointments        - Doctor views their appointments
+- GET  /api/appointments/<appointment_id> - View details of a specific appointment
 
-Date format  : "YYYY-MM-DD"   e.g. "2025-08-15"
-Time format  : "HH:MM"        e.g. "09:00"  (24-hour)
+
 """
 
 import sqlalchemy as sa
@@ -27,9 +35,7 @@ from controllers.models import (
 )
 
 
-# ---------------------------------------------------------------------------
-# Shared serializers
-# ---------------------------------------------------------------------------
+# Shared serializers and helper functions
 
 def _serialize_slot(slot, db_session):
     """Serialize a DoctorAvailability slot with live booking counts."""
@@ -101,10 +107,8 @@ def _get_role():
     return [r.name for r in current_user.roles][0] if current_user.roles else None
 
 
-# ---------------------------------------------------------------------------
 # GET /api/doctors
 # List all doctors (used by patient to browse and book)
-# ---------------------------------------------------------------------------
 class DoctorListAPI(Resource):
     """
     Public-ish list of all doctors with their department and upcoming
@@ -166,10 +170,8 @@ class DoctorListAPI(Resource):
         return _ok({"doctors": result})
 
 
-# ---------------------------------------------------------------------------
 # GET /api/doctors/<doctor_id>/availability
 # List a specific doctor's open slots (used by patient before booking)
-# ---------------------------------------------------------------------------
 class DoctorAvailabilityListAPI(Resource):
     """
     Returns all OPEN, future availability slots for a given doctor.
@@ -185,9 +187,9 @@ class DoctorAvailabilityListAPI(Resource):
 
     Query Parameters (optional)
     ---------------------------
-        date       : "YYYY-MM-DD"  – filter by a specific date
-        from_date  : "YYYY-MM-DD"  – start of range (default: today)
-        to_date    : "YYYY-MM-DD"  – end of range (default: today + 14 days)
+        date       : "YYYY-MM-DD"  - filter by a specific date
+        from_date  : "YYYY-MM-DD"  - start of range (default: today)
+        to_date    : "YYYY-MM-DD"  - end of range (default: today + 14 days)
 
     Success Response (200)
     ----------------------
@@ -247,10 +249,8 @@ class DoctorAvailabilityListAPI(Resource):
         })
 
 
-# ---------------------------------------------------------------------------
 # POST /api/doctor/availability          – Doctor creates a slot
 # GET  /api/doctor/availability          – Doctor views their own slots
-# ---------------------------------------------------------------------------
 class ManageAvailabilityAPI(Resource):
     """
     Doctor: create a new availability slot or view your own slots.
@@ -390,10 +390,8 @@ class ManageAvailabilityAPI(Resource):
             return _error(f"Failed to create slot: {str(e)}", 500)
 
 
-# ---------------------------------------------------------------------------
 # PUT  /api/doctor/availability/<slot_id>   – Doctor edits a slot
 # DELETE /api/doctor/availability/<slot_id> – Doctor deletes a slot
-# ---------------------------------------------------------------------------
 class ManageAvailabilityDetailAPI(Resource):
     """
     Doctor: Edit or delete one of your own availability slots.
@@ -403,7 +401,7 @@ class ManageAvailabilityDetailAPI(Resource):
         Authentication-Token: <doctor_token>
 
     ── PUT ──────────────────────────────────────────────────────────────────
-    Request Body (JSON) – all fields optional:
+    Request Body (JSON) - all fields optional:
         {
           "date":          "2025-08-16",
           "start_time":    "10:00",
@@ -540,10 +538,8 @@ class ManageAvailabilityDetailAPI(Resource):
             return _error(f"Delete failed: {str(e)}", 500)
 
 
-# ---------------------------------------------------------------------------
 # POST /api/appointments/book/<slot_id>
 # Patient books a specific availability slot
-# ---------------------------------------------------------------------------
 class BookSlotAPI(Resource):
     """
     Patient: Book an open availability slot by its ID.
@@ -554,7 +550,7 @@ class BookSlotAPI(Resource):
 
     URL Parameter
     -------------
-        slot_id : int  – the DoctorAvailability.id the patient wants to book
+        slot_id : int  - the DoctorAvailability.id the patient wants to book
 
     No request body needed.
 
@@ -628,9 +624,7 @@ class BookSlotAPI(Resource):
             return _error(f"Booking failed: {str(e)}", 500)
 
 
-# ---------------------------------------------------------------------------
 # GET  /api/appointments/my             – Patient sees their appointments
-# ---------------------------------------------------------------------------
 class PatientAppointmentsAPI(Resource):
     """
     Patient: View all your own appointments.
@@ -681,10 +675,8 @@ class PatientAppointmentsAPI(Resource):
         return _ok({"appointments": [_serialize_appointment(a) for a in appts]})
 
 
-# ---------------------------------------------------------------------------
 # POST /api/appointments/<appointment_id>/cancel
 # Patient cancels their own appointment
-# ---------------------------------------------------------------------------
 class PatientCancelAppointmentAPI(Resource):
     """
     Patient: Cancel one of your own appointments.
@@ -737,10 +729,8 @@ class PatientCancelAppointmentAPI(Resource):
             return _error(f"Cancellation failed: {str(e)}", 500)
 
 
-# ---------------------------------------------------------------------------
 # GET  /api/doctor/appointments         – Doctor sees their own appointments
 # POST /api/doctor/appointments/<id>/status – Doctor updates appointment status
-# ---------------------------------------------------------------------------
 class DoctorAppointmentsAPI(Resource):
     """
     Doctor: View all appointments assigned to you.
@@ -860,10 +850,8 @@ class DoctorUpdateAppointmentStatusAPI(Resource):
             return _error(f"Update failed: {str(e)}", 500)
 
 
-# ---------------------------------------------------------------------------
 # GET  /api/doctor/patients
 # Doctor sees the distinct list of all patients they've ever had
-# ---------------------------------------------------------------------------
 class DoctorPatientListAPI(Resource):
     """
     Doctor: List all unique patients who have had an appointment with you.
@@ -923,9 +911,7 @@ class DoctorPatientListAPI(Resource):
         return _ok({"patients": result})
 
 
-# ---------------------------------------------------------------------------
 # Route Registration Helper
-# ---------------------------------------------------------------------------
 def register_appointment_routes(api):
     """
     Call this from your app factory.

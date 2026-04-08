@@ -8,24 +8,56 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --save 60 1 --loglevel warning
     restart: unless-stopped
 
   mailhog:
     image: mailhog/mailhog:latest
     ports:
-      - "1025:1025"   # SMTP — Flask sends mail here
-      - "8025:8025"   # Web UI — view emails at http://localhost:8025
+      - "1025:1025"
+      - "8025:8025"
+    restart: unless-stopped
+
+  worker:
+    build: .
+    command: celery -A app.celery worker --loglevel=info -P threads
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6379/0
+      - CACHE_REDIS_URL=redis://redis:6379/1
+      - MAIL_SERVER=mailhog
+      - MAIL_PORT=1025
+    depends_on:
+      - redis
+      - mailhog
+    restart: unless-stopped
+
+  beat:
+    build: .
+    command: celery -A app.celery beat --loglevel=info
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
     restart: unless-stopped
 
   flower:
     image: mher/flower:latest
     ports:
-      - "5555:5555"   # Celery task monitor UI
+      - "5555:5555"
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - redis
+      - worker
     restart: unless-stopped
 
 volumes:

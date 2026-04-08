@@ -1,4 +1,3 @@
-# app/models.py
 from controllers.database import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_security import UserMixin, RoleMixin

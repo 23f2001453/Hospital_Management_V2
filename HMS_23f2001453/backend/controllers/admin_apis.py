@@ -1,4 +1,3 @@
-# api/admin_apis.py
 """
 Admin API — extended endpoints:
   GET  /admin/search                     — universal search across users, departments
@@ -8,12 +7,12 @@ Admin API — extended endpoints:
   POST /admin/users/<id>/unblacklist      — restore a user
   GET  /admin/jobs/<task_id>              — poll Celery task status
 """
-import sqlalchemy as sa
+import sqlalchemy as sa # type: ignore
 from datetime import date, timedelta
-from flask import request
-from flask_restful import Resource
-from flask_security import auth_required, roles_required
-from flask_login import current_user
+from flask import request   # type: ignore
+from flask_restful import Resource  # type: ignore
+from flask_security import auth_required, roles_required    # type: ignore
+from flask_login import current_user    # type: ignore
 
 from controllers.database import db
 from controllers.models import (
@@ -23,14 +22,14 @@ from controllers.models import (
 from cache import cache
 from controllers.config import Config
 
-# ── Helpers ───────────────────────────────────────────────────────────────
+# Helpers 
 
 def _ok(data, code=200):
-    from flask import jsonify, make_response
+    from flask import jsonify, make_response    # type: ignore
     return make_response(jsonify(data), code)
 
 def _error(msg, code=400):
-    from flask import jsonify, make_response
+    from flask import jsonify, make_response    # type: ignore
     return make_response(jsonify({'error': msg}), code)
 
 def _serialize_user(u):
@@ -69,7 +68,7 @@ def _serialize_appt(a):
     }
 
 
-# ── GET /admin/search ─────────────────────────────────────────────────────
+# GET /admin/search 
 class AdminSearchAPI(Resource):
     """
     Universal search across users, departments, doctors by specialization.
@@ -105,7 +104,7 @@ class AdminSearchAPI(Resource):
         pattern = f'%{q}%'
         results = {'users': [], 'departments': []}
 
-        # ── User search ────────────────────────────────────────────────
+        # User search matches username, email, phone, or doctor specialization
         user_query = (
             sa.select(User)
             .outerjoin(User.doctor)
@@ -130,7 +129,7 @@ class AdminSearchAPI(Resource):
         users = db.session.scalars(user_query.limit(20)).all()
         results['users'] = [_serialize_user(u) for u in users]
 
-        # ── Department search ──────────────────────────────────────────
+        # Department search 
         if not type_filter or type_filter == 'department':
             depts = db.session.scalars(
                 sa.select(Department).where(Department.name.ilike(pattern)).limit(10)
@@ -147,7 +146,7 @@ class AdminSearchAPI(Resource):
         return _ok(payload)
 
 
-# ── GET /admin/appointments ───────────────────────────────────────────────
+# GET /admin/appointments 
 class AdminAppointmentsAPI(Resource):
     """
     All appointments in the system with rich filters.
@@ -210,7 +209,7 @@ class AdminAppointmentsAPI(Resource):
         })
 
 
-# ── GET /admin/appointments/<id>/treatment ────────────────────────────────
+# GET /admin/appointments/<id>/treatment 
 class AdminTreatmentDetailAPI(Resource):
     """
     View the treatment record for any appointment (admin only).
@@ -236,7 +235,7 @@ class AdminTreatmentDetailAPI(Resource):
         })
 
 
-# ── POST /admin/users/<id>/blacklist ──────────────────────────────────────
+# POST /admin/users/<id>/blacklist 
 class AdminBlacklistAPI(Resource):
     """
     Blacklist (deactivate) a user — they can no longer log in.
@@ -284,7 +283,7 @@ class AdminBlacklistAPI(Resource):
         return _ok({'message': f'User {user.username} has been unblacklisted.', 'user': _serialize_user(user)})
 
 
-# ── GET /admin/jobs/<task_id> ─────────────────────────────────────────────
+# GET /admin/jobs/<task_id> 
 class AdminJobStatusAPI(Resource):
     """
     Poll the status of any Celery async task by its task_id.
@@ -316,7 +315,7 @@ class AdminJobStatusAPI(Resource):
         return _ok(payload)
 
 
-# ── POST /api/patient/export-csv ─────────────────────────────────────────
+# POST /api/patient/export-csv 
 class PatientExportCSVAPI(Resource):
     """
     Patient triggers their own CSV export (user-triggered async job).
@@ -336,7 +335,7 @@ class PatientExportCSVAPI(Resource):
         }, 202)
 
 
-# ── Route registration ────────────────────────────────────────────────────
+# Route registration 
 def register_admin_routes(api):
     api.add_resource(AdminSearchAPI,          '/admin/search')
     api.add_resource(AdminAppointmentsAPI,    '/admin/appointments')

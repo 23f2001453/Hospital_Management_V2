@@ -1,15 +1,14 @@
-# app/api/treatment_apis.py
 """
 Treatment REST API
-==================
-Covers diagnosis, prescription, and treatment notes for completed appointments.
 
-Auth: All endpoints require —
-    Authentication-Token: <auth_token>
+diagnosis, prescription, and treatment notes for completed appointments.
 
-Only a doctor who owns the appointment can create/update a Treatment.
-The patient who owns the appointment can read it.
-Admins can read any treatment.
+Endpoints:
+- POST /api/doctor/appointments/<appointment_id>/treat
+- GET  /api/doctor/appointments/<appointment_id>/treat
+- GET  /api/appointments/<appointment_id>/treatment
+- GET  /api/doctor/patients/<patient_id>/history
+
 """
 
 import sqlalchemy as sa
@@ -22,9 +21,7 @@ from controllers.database import db
 from controllers.models import Doctor, Patient, Appointment, Treatment
 
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 
 def _serialize_treatment(treatment, appt):
     return {
@@ -55,15 +52,12 @@ def _get_role():
     return [r.name for r in current_user.roles][0] if current_user.roles else None
 
 
-# ---------------------------------------------------------------------------
 # POST /api/doctor/appointments/<appointment_id>/treat
 # GET  /api/doctor/appointments/<appointment_id>/treat
 # Doctor creates or updates treatment; also views their own treatment record
-# ---------------------------------------------------------------------------
 class TreatAppointmentAPI(Resource):
     """
     Doctor: Add or update the treatment record for an appointment.
-    Creating a treatment automatically moves the appointment status to 'Completed'.
 
     Headers Required
     ----------------
@@ -99,17 +93,6 @@ class TreatAppointmentAPI(Resource):
     Success (200):
         { "message": "Treatment updated.", "treatment": { ...treatment object... } }
 
-    ── GET ──────────────────────────────────────────────────────────────────
-    Doctor views the treatment record for one of their appointments.
-
-    Success (200):
-        { "treatment": { ...treatment object... } }
-
-    Error Responses
-    ---------------
-        403  Not a doctor / not your appointment
-        404  Appointment or treatment not found
-        409  Appointment status is wrong for this action
     """
 
     @auth_required("token")
@@ -227,10 +210,8 @@ class TreatAppointmentAPI(Resource):
             return _error(f"Update failed: {str(e)}", 500)
 
 
-# ---------------------------------------------------------------------------
 # GET /api/appointments/<appointment_id>/treatment
 # Patient views their own treatment record
-# ---------------------------------------------------------------------------
 class PatientViewTreatmentAPI(Resource):
     """
     Patient: View the treatment/prescription for one of your appointments.
@@ -285,10 +266,8 @@ class PatientViewTreatmentAPI(Resource):
         return _ok({"treatment": _serialize_treatment(appt.treatment, appt)})
 
 
-# ---------------------------------------------------------------------------
 # GET /api/doctor/patients/<patient_id>/history
 # Doctor views full treatment history for one of their patients
-# ---------------------------------------------------------------------------
 class PatientTreatmentHistoryAPI(Resource):
     """
     Doctor or Admin: View the complete appointment + treatment history
@@ -300,7 +279,7 @@ class PatientTreatmentHistoryAPI(Resource):
 
     URL Parameter
     -------------
-        patient_id : int  – the Patient.id (not User.id)
+        patient_id : int  - the Patient.id (not User.id)
 
     Success Response (200)
     ----------------------
@@ -377,9 +356,7 @@ class PatientTreatmentHistoryAPI(Resource):
         return _ok({"patient_id": patient_id, "history": history})
 
 
-# ---------------------------------------------------------------------------
 # Route Registration Helper
-# ---------------------------------------------------------------------------
 def register_treatment_routes(api):
     """
     Call this from your app factory alongside the other register_* helpers.

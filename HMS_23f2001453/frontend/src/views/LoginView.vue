@@ -36,7 +36,7 @@ async function login() {
       <div class="brand-block">
         <div class="brand-icon">✚</div>
         <h1 class="brand-title">MediCore</h1>
-        <p class="brand-tagline">Hospital Management Platform</p>
+        <p class="brand-tagline">Name: Hospital Management System V2</p>
       </div>
       <div class="feature-list">
         <div class="feature-item" v-for="f in features" :key="f.title">
@@ -111,17 +111,48 @@ export default {
 }
 
 .login-left {
-  flex: 1; background: var(--navy);
+  flex: 1; 
+  background: var(--navy);
   padding: 60px 48px;
-  display: flex; flex-direction: column; justify-content: center;
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center;
 }
-.brand-block { margin-bottom: 56px; }
-.brand-icon { font-size: 2.5rem; color: var(--teal); margin-bottom: 16px; }
-.brand-title { font-family: 'Instrument Serif', serif; font-size: 2.8rem; color: #fff; margin-bottom: 8px; }
-.brand-tagline { color: #94a3b8; font-size: 15px; }
 
-.feature-list { display: flex; flex-direction: column; gap: 28px; }
-.feature-item { display: flex; gap: 16px; align-items: flex-start; }
+.brand-block { 
+  margin-bottom: 56px; 
+}
+
+.brand-icon { 
+  font-size: 2.5rem; 
+  color: var(--teal); 
+  margin-bottom: 16px; 
+}
+
+.brand-title { 
+  font-family: 'Instrument Serif', serif; 
+  font-size: 2.8rem; 
+  color: #fff; 
+  margin-bottom: 8px; 
+}
+
+.brand-tagline {
+  color: #94a3b8; 
+  font-size: 15px; 
+}
+
+.feature-list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 28px; 
+}
+
+.feature-item { 
+  display: flex; 
+  gap: 16px; 
+  align-items: flex-start;
+}
+
 .feature-icon { font-size: 1.5rem; flex-shrink: 0; }
 .feature-title { color: #fff; font-weight: 500; margin-bottom: 3px; }
 .feature-desc { color: #94a3b8; font-size: 13px; }

@@ -1,15 +1,15 @@
-# app/api/authentication_apis.py
 """
 Authentication & User Management REST API
-==========================================
-All endpoints return JSON. Requires Flask-RESTful, Flask-Security-Too,
-and a configured `user_datastore` (SQLAlchemyUserDatastore) plus `db`
-imported from your app's database controller.
 
-Token strategy: Flask-Security-Too's built-in token auth is used.
-  - After login, the client receives an `auth_token`.
-  - Protected endpoints expect the header:
-      Authentication-Token: <auth_token>
+Endpoints:
+- POST /api/auth/register
+- POST /api/auth/login
+- POST /api/auth/logout
+- GET  /api/auth/me
+- PUT  /api/auth/me
+- GET  /api/admin/users
+- GET/PUT/DELETE /api/admin/users/<user_id>
+
 """
 
 import uuid

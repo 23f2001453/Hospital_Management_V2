@@ -3,13 +3,13 @@
 Celery application factory.
 
 Start the worker:
-    celery -A celery_app.celery worker --loglevel=info
+    celery -A app.celery worker --loglevel=info -P threads
 
 Start the beat scheduler (for periodic tasks):
-    celery -A celery_app.celery beat --loglevel=info
+    celery -A app.celery beat --loglevel=info
 
 Monitor tasks (Flower UI at http://localhost:5555):
-    celery -A celery_app.celery flower
+    celery -A app.celery flower --broker=redis://localhost:6379/0 --port=5555
 """
 from celery import Celery
 from celery.schedules import crontab
@@ -28,8 +28,8 @@ def make_celery(app):
     )
 
     celery.conf.update(
-        timezone=app.config.get('CELERY_TIMEZONE', 'UTC'),
-        enable_utc=app.config.get('CELERY_ENABLE_UTC', True),
+        timezone=app.config.get('CELERY_TIMEZONE', 'Asia/Kolkata'),
+        enable_utc=app.config.get('CELERY_ENABLE_UTC', False),
         task_serializer='json',
         result_serializer='json',
         accept_content=['json'],
@@ -39,12 +39,12 @@ def make_celery(app):
             # Daily appointment reminder — runs at 08:00 every day
             'daily-appointment-reminders': {
                 'task': 'tasks.reminder_tasks.send_daily_reminders',
-                'schedule': crontab(hour=8, minute=0),
+                'schedule': crontab(hour=17, minute=33),
             },
-            # Monthly doctor activity report — runs at 06:00 on the 1st of every month
+            # Monthly doctor activity report — runs at 07:30 on the 6th of every month
             'monthly-doctor-report': {
                 'task': 'tasks.report_tasks.send_monthly_reports',
-                'schedule': crontab(hour=6, minute=0, day_of_month=1),
+                'schedule': crontab(hour=17, minute=10, day_of_month=7),
             },
         },
     )

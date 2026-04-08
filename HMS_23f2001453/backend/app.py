@@ -1,4 +1,3 @@
-# app.py
 import uuid
 from flask import Flask
 from flask_security import Security
@@ -44,7 +43,7 @@ def create_app():
 
     api = Api(app, prefix='/api')
 
-    # ── Auth ──────────────────────────────────────────────────────────────
+    # Auth 
     api.add_resource(RegisterAPI,        '/auth/register')
     api.add_resource(LoginAPI,           '/auth/login')
     api.add_resource(LogoutAPI,          '/auth/logout')
@@ -53,31 +52,31 @@ def create_app():
     api.add_resource(AdminUserListAPI,   '/admin/users')
     api.add_resource(AdminUserDetailAPI, '/admin/users/<int:user_id>')
 
-    # ── Doctors & availability ─────────────────────────────────────────────
+    # Doctors & availability 
     api.add_resource(DoctorListAPI,                    '/doctors')
     api.add_resource(DoctorAvailabilityListAPI,        '/doctors/<int:doctor_id>/availability')
     api.add_resource(ManageAvailabilityAPI,            '/doctor/availability')
     api.add_resource(ManageAvailabilityDetailAPI,      '/doctor/availability/<int:slot_id>')
 
-    # ── Doctor appointment management ─────────────────────────────────────
+    # Doctor appointment management 
     api.add_resource(DoctorAppointmentsAPI,            '/doctor/appointments')
     api.add_resource(DoctorUpdateAppointmentStatusAPI, '/doctor/appointments/<int:appointment_id>/status')
     api.add_resource(DoctorPatientListAPI,             '/doctor/patients')
 
-    # ── Treatment ─────────────────────────────────────────────────────────
+    # Treatment 
     api.add_resource(TreatAppointmentAPI,        '/doctor/appointments/<int:appointment_id>/treat')
     api.add_resource(PatientTreatmentHistoryAPI, '/doctor/patients/<int:patient_id>/history')
 
-    # ── Patient actions ───────────────────────────────────────────────────
+    # Patient actions 
     api.add_resource(BookSlotAPI,                '/appointments/book/<int:slot_id>')
     api.add_resource(PatientAppointmentsAPI,     '/appointments/my')
     api.add_resource(PatientCancelAppointmentAPI,'/appointments/<int:appointment_id>/cancel')
     api.add_resource(PatientViewTreatmentAPI,    '/appointments/<int:appointment_id>/treatment')
 
-    # ── Admin extended + jobs + export ────────────────────────────────────
+    # Admin extended + jobs + export 
     register_admin_routes(api)
 
-    # ── DB seed ───────────────────────────────────────────────────────────
+    # DB seed 
     with app.app_context():
         db.create_all()
 

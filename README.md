@@ -61,11 +61,11 @@ Medicore is a modern full-stack Hospital Management System built using a **Vue.j
 
 ## Screenshots
 
-![Login](assets/login.png)
-![Login](assets/login.png)
-![Login](assets/login.png)
-![Login](assets/login.png)
-![Login](assets/login.png)
+![1](assets/Screenshot_2026-05-16_180732.png)
+![2](assets/Screenshot_2026-05-16_180751.png)
+![3](assets/Screenshot_2026-05-16_180824.png)
+![4](assets/Screenshot_2026-05-16_180838.png)
+![5](assets/Screenshot_2026-05-16_180906.png)
 
 
 ---
@@ -116,13 +116,15 @@ npm run dev
 
 📄 Complete project documentation:
 
-**Project_Report.pdf**
+**![Project Report](project_report.pdf)**
 
 ---
 
 ## Demo
 
-🎥 Add your demo GIF or project video here.
+🎥 Demo video:
+
+**![Project Demonstration](https://drive.google.com/file/d/1HevmPyHj4n0gAp8ykOiF-n3JLVrdSQO9)**
 
 ---
 

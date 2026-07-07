@@ -116,7 +116,7 @@ npm run dev
 
 📄 Complete project documentation:
 
-**![Project Report](project_report.pdf)**
+**[Project Report](project_report.pdf)**
 
 ---
 
@@ -124,7 +124,7 @@ npm run dev
 
 🎥 Demo video:
 
-**![Project Demonstration](https://drive.google.com/file/d/1HevmPyHj4n0gAp8ykOiF-n3JLVrdSQO9)**
+**[Project Demonstration](https://drive.google.com/file/d/1HevmPyHj4n0gAp8ykOiF-n3JLVrdSQO9)**
 
 ---
 
